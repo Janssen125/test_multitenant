@@ -8,11 +8,26 @@ use Illuminate\Http\Request;
 
 class CmsController extends Controller
 {
+    /**
+     * Tenant Resource Overview (Dashboard Stats)
+     */
     public function dashboard()
     {
+        $stats = [
+            'total_dishes' => Menu::count('*'),
+            'pending_orders' => 0,
+            'team_count' => User::count('*'),
+        ];
+        return view('tenant.dashboard', compact('stats'));
+    }
+
+    /**
+     * Dedicated Menu Management View
+     */
+    public function menuIndex()
+    {
         $menus = Menu::all();
-        $users = User::all();
-        return view('tenant.dashboard', compact('menus', 'users'));
+        return view('tenant.menus.index', compact('menus'));
     }
 
     public function createMenu()
@@ -31,7 +46,7 @@ class CmsController extends Controller
 
         Menu::create($validated);
 
-        return redirect()->route('tenant.dashboard')->with('status', 'New dish added and served! 🍽️');
+        return redirect()->route('tenant.menu.index')->with('status', 'New dish added and served! 🍽️');
     }
 
     public function editMenu(Menu $menu)
@@ -50,13 +65,13 @@ class CmsController extends Controller
 
         $menu->update($validated);
 
-        return redirect()->route('tenant.dashboard')->with('status', 'Dish updated successfully!');
+        return redirect()->route('tenant.menu.index')->with('status', 'Dish updated successfully!');
     }
 
     public function destroyMenu(Menu $menu)
     {
         $menu->delete();
-        return redirect()->route('tenant.dashboard')->with('status', 'Dish removed from menu.');
+        return redirect()->route('tenant.menu.index')->with('status', 'Dish removed from menu.');
     }
 
     public function orders()

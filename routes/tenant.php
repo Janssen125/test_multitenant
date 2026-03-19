@@ -6,30 +6,25 @@ use App\Http\Controllers\CmsController;
 use App\Http\Controllers\PublicController;
 use Illuminate\Support\Facades\Route;
 
-/**
- * Tenant Routes
- * 
- * These routes are protected by the stancl/tenancy middleware.
- * Identification is handled automatically by the hostname (InitializeTenancyByDomain).
- */
+// Group all tenant routes under the necessary multi-tenant middleware
 Route::middleware([
     'web',
     \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
     \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
 ])->group(function () {
     
-    // Public Restaurant Front-end (e.g., http://acme.localhost:8000/)
+    // Public Restaurant Front-end 
     Route::get('/', [PublicController::class, 'showMenu'])->name('tenant.public');
 
-    // Tenant Administration CMS (e.g., http://acme.localhost:8000/admin/dashboard)
-    Route::prefix('admin')->group(function () {
+    // Tenant Administration CMS 
+    Route::group(['prefix' => 'admin'], function () {
         Route::get('/dashboard', [CmsController::class, 'dashboard'])->name('tenant.dashboard');
 
         // Orders Management
         Route::get('/orders', [CmsController::class, 'orders'])->name('tenant.orders');
 
         // Workspace Team Management (Full CRUD)
-        Route::prefix('team')->group(function() {
+        Route::group(['prefix' => 'team'], function() {
             Route::get('/', [CmsController::class, 'team'])->name('tenant.team');
             Route::get('/create', [CmsController::class, 'createUser'])->name('tenant.team.create');
             Route::post('/', [CmsController::class, 'storeUser'])->name('tenant.team.store');
@@ -39,7 +34,8 @@ Route::middleware([
         });
 
         // Menu & Dish Management (Full CRUD)
-        Route::prefix('menu')->group(function() {
+        Route::group(['prefix' => 'menu'], function() {
+            Route::get('/', [CmsController::class, 'menuIndex'])->name('tenant.menu.index');
             Route::get('/create', [CmsController::class, 'createMenu'])->name('tenant.menu.create');
             Route::post('/', [CmsController::class, 'storeMenu'])->name('tenant.menu.store');
             Route::get('/{menu}/edit', [CmsController::class, 'editMenu'])->name('tenant.menu.edit');
