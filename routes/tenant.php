@@ -18,8 +18,17 @@ foreach ($centralDomains as $domain) {
             \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
         ])
         ->group(function () {
+            // Public Application View (The Restaurant Menu for Customers)
             Route::get('/', function () {
-                return 'TENANT: ' . tenant('id');
+                $menus = \App\Models\Menu::where('is_active', '=', true)->get();
+                return view('tenant.public', compact('menus'));
+            });
+
+            // Tenant CMS Admin Dashboard (For the Restaurant Owner to Manage Menus)
+            Route::get('/admin/dashboard', function () {
+                $menus = \App\Models\Menu::all();
+                $users = \App\Models\User::all();
+                return view('tenant.dashboard', compact('menus', 'users'));
             });
         });
 }

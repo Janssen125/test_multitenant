@@ -17,7 +17,6 @@ return [
      * The list of domains hosting your central app.
      *
      * Only relevant if you're using the domain or subdomain identification middleware.
-     */
     'central_domains' => array_filter([
         'test_multi_tenant.test',
         'localhost',
@@ -25,7 +24,6 @@ return [
         env('CENTRAL_DOMAIN'),
         env('VERCEL_URL'),
         env('APP_URL') ? parse_url(env('APP_URL'), PHP_URL_HOST) : null,
-        isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null, // Fallback to current host if not matched (useful for auto-Vercel branching)
     ]),
 
     /**

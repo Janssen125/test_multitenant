@@ -60,7 +60,7 @@
                                 
                                 <div class="space-y-2 relative z-10">
                                     @foreach($tenant->domains as $domain)
-                                        <a href="http://{{ $domain->domain }}" class="flex items-center justify-between px-4 py-3 bg-black/40 hover:bg-black/60 rounded-xl text-sm text-indigo-300 hover:text-indigo-200 transition border border-transparent hover:border-indigo-500/30 group/link">
+                                        <a href="http://{{ $domain->domain }}{{ request()->getPort() && request()->getPort() != 80 ? ':' . request()->getPort() : '' }}" class="flex items-center justify-between px-4 py-3 bg-black/40 hover:bg-black/60 rounded-xl text-sm text-indigo-300 hover:text-indigo-200 transition border border-transparent hover:border-indigo-500/30 group/link">
                                             <span class="font-medium font-mono text-xs">{{ $domain->domain }}</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover/link:translate-x-1 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                                         </a>
