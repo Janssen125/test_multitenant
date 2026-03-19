@@ -32,13 +32,15 @@ class DatabaseSeeder extends Seeder
 
     private function createTenantIfNotExists(string $id, array $domains): void
     {
-        if (!Tenant::where('id', $id)->first()) {
+        $tenant = Tenant::find($id);
+        
+        if (!$tenant) {
             $tenant = Tenant::create(['id' => $id]);
-            foreach ($domains as $domain) {
-                // Ignore domains if they already exist
-                if (!$tenant->domains()->where('domain', $domain)->exists()) {
-                    $tenant->domains()->create(['domain' => $domain]);
-                }
+        }
+
+        foreach ($domains as $domain) {
+            if (!$tenant->domains()->where('domain', $domain)->exists()) {
+                $tenant->domains()->create(['domain' => $domain]);
             }
         }
     }
