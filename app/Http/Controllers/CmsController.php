@@ -33,4 +33,15 @@ class CmsController extends Controller
 
         return redirect()->route('tenant.dashboard')->with('status', 'New dish added and served! 🍽️');
     }
+
+    public function orders()
+    {
+        return view('tenant.orders.index');
+    }
+
+    public function team()
+    {
+        $users = User::all();
+        return view('tenant.team.index', compact('users'));
+    }
 }
