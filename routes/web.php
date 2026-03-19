@@ -26,19 +26,29 @@ foreach ($centralDomains as $domain) {
         })->name('central.landing');
 
         // Super Admin Hub routes
-        Route::prefix('admin')->group(function () {
+        Route::group(['prefix' => 'admin'], function() {
             
             // Master Admin Dashboard 
             Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('central.dashboard');
 
-            // Master Tenant & Workspace Management
-            Route::prefix('tenants')->group(function() {
+            // Workspace Management (Full CRUD)
+            Route::group(['prefix' => 'tenants'], function() {
                 Route::get('/', [TenantController::class, 'index'])->name('tenants.index');
                 Route::get('/create', [TenantController::class, 'create'])->name('tenants.create');
                 Route::post('/', [TenantController::class, 'store'])->name('tenants.store');
                 Route::get('/{tenant}/edit', [TenantController::class, 'edit'])->name('tenants.edit');
                 Route::put('/{tenant}', [TenantController::class, 'update'])->name('tenants.update');
                 Route::delete('/{tenant}', [TenantController::class, 'destroy'])->name('tenants.destroy');
+            });
+
+            // Master User Management (Full CRUD)
+            Route::group(['prefix' => 'users'], function() {
+                Route::get('/', [AdminController::class, 'usersIndex'])->name('central.users.index');
+                Route::get('/create', [AdminController::class, 'createUser'])->name('central.users.create');
+                Route::post('/', [AdminController::class, 'storeUser'])->name('central.users.store');
+                Route::get('/{user}/edit', [AdminController::class, 'editUser'])->name('central.users.edit');
+                Route::put('/{user}', [AdminController::class, 'updateUser'])->name('central.users.update');
+                Route::delete('/{user}', [AdminController::class, 'destroyUser'])->name('central.users.destroy');
             });
         });
     });
