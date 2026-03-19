@@ -1,70 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ ucfirst(tenant('id')) }} - Workspace Team</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Inter', sans-serif; }</style>
-</head>
-<body class="bg-slate-50 text-slate-900 min-h-screen">
-    <nav class="bg-indigo-700 text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <h1 class="text-xl font-bold tracking-tight">{{ ucfirst(tenant('id')) }} Hub Team</h1>
-            <a href="{{ route('tenant.dashboard') }}" class="text-sm font-medium hover:text-indigo-200 transition text-indigo-100">Back to Dashboard</a>
+@extends('layouts.tenant')
+
+@section('title', 'Workspace Team')
+
+@section('content')
+    <header class="mb-12 flex justify-between items-end gap-10">
+        <div>
+            <h2 class="text-6xl font-black tracking-tighter text-slate-900 mb-2 font-primary">Workspace Team 👥</h2>
+            <p class="text-xl text-slate-500 font-medium italic decoration-slate-400">Invite and manage chefs, waiters, and managers for your restaurant.</p>
         </div>
-    </nav>
+        <a href="{{ route('tenant.team.create') }}" class="bg-indigo-600 text-white px-10 py-5 rounded-[2rem] font-black uppercase tracking-widest shadow-xl shadow-indigo-100/50 hover:scale-105 transition shrink-0">Invite Member</a>
+    </header>
 
-    <main class="max-w-6xl mx-auto px-6 py-12 md:py-16">
-        <header class="flex justify-between items-center mb-12">
-            <div>
-                <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Manage Your Isolated Team</h2>
-                <p class="text-slate-500 mt-2 font-medium italic">These users have access specifically to the {{ ucfirst(tenant('id')) }} workspace only.</p>
-            </div>
-            <a href="{{ route('tenant.team.create') }}" class="bg-indigo-600 text-white px-8 py-3.5 rounded-2xl font-bold shadow-xl shadow-indigo-100 hover:scale-105 transition">Invite Member</a>
-        </header>
-
-        @if(session('status'))
-            <div class="mb-8 p-4 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-2xl font-bold shadow-sm">
-                {{ session('status') }}
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="mb-8 p-4 bg-rose-100 text-rose-800 border border-rose-200 rounded-2xl font-bold shadow-sm">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            @foreach($users as $user)
-                <div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 flex flex-col group hover:-translate-y-1 transition duration-300 relative overflow-hidden">
-                    <div class="flex items-center gap-6 mb-8">
-                        <div class="w-16 h-16 rounded-2xl bg-indigo-500 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-100 transition duration-500 group-hover:rotate-6">{{ strtoupper(substr($user->name, 0, 1)) }}</div>
-                        <div class="overflow-hidden">
-                            <p class="font-extrabold text-slate-900 text-xl tracking-tight truncate leading-tight">{{ $user->name }}</p>
-                            <p class="text-xs text-slate-400 font-medium truncate mb-2 mt-0.5">{{ $user->email }}</p>
-                            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-black uppercase tracking-widest">Active Member</span>
-                        </div>
-                    </div>
-
-                    <div class="mt-auto flex gap-3 pt-6 border-t border-slate-50">
-                        <a href="{{ route('tenant.team.edit', $user->id) }}" class="flex-1 bg-indigo-50 text-indigo-700 py-3 rounded-xl text-center text-sm font-bold hover:bg-indigo-600 hover:text-white transition group/btn">
-                             Edit Profile
-                        </a>
-                        <form action="{{ route('tenant.team.destroy', $user->id) }}" method="POST" class="inline" onsubmit="return confirm('Remove this user from the workspace?')">
-                            @csrf
-                            @method('DELETE')
-                            <button class="bg-rose-50 text-rose-600 p-3 rounded-xl hover:bg-rose-600 hover:text-white transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            @endforeach
+    @if(session('status'))
+        <div class="mb-12 p-6 bg-emerald-100 text-emerald-800 border-l-8 border-emerald-500 rounded-3xl font-black uppercase tracking-widest text-sm">
+            {{ session('status') }}
         </div>
-    </main>
-</body>
-</html>
+    @endif
+
+    <div class="bg-white rounded-[3.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden mb-12">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="text-slate-400 text-xs font-black uppercase tracking-widest border-b border-slate-100 bg-slate-50/50">
+                    <th class="px-10 py-7">Member Identity</th>
+                    <th class="px-10 py-7 text-center">Contact Email</th>
+                    <th class="px-10 py-7 text-center">Role Status</th>
+                    <th class="px-10 py-7 text-right pr-16">Controls</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50 lowercase">
+                @foreach($users as $user)
+                    <tr class="hover:bg-slate-50/30 transition capitalize">
+                        <td class="px-10 py-10">
+                            <div class="flex items-center gap-6">
+                                <div class="w-16 h-16 rounded-[1.5rem] bg-indigo-600 flex items-center justify-center text-white font-black text-2xl shadow-xl shadow-indigo-100 rotate-2">{{ substr($user->name, 0, 1) }}</div>
+                                <div>
+                                    <p class="font-black text-2xl text-slate-900 tracking-tight leading-tight">{{ $user->name }}</p>
+                                    <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-1 opacity-60">Joined {{ $user->created_at->diffForHumans() }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-10 py-10 text-center">
+                            <span class="font-bold text-slate-600 bg-slate-100 px-5 py-2 rounded-2xl border border-slate-200 lowercase tracking-tight">{{ $user->email }}</span>
+                        </td>
+                        <td class="px-10 py-10 text-center">
+                             <span class="inline-flex items-center gap-1.5 px-5 py-2 bg-indigo-100 text-indigo-700 rounded-full text-[10px] font-black uppercase tracking-widest border border-indigo-100">
+                                Administrator
+                            </span>
+                        </td>
+                        <td class="px-10 py-10 text-right pr-16 capitalize">
+                            <div class="flex justify-end gap-3">
+                                <a href="{{ route('tenant.team.edit', $user->id) }}" class="p-4 bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white rounded-[1.5rem] transition shadow-sm border border-indigo-100">
+                                    Edit
+                                </a>
+                                <form action="{{ route('tenant.team.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Revoke workspace access for this member?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="p-4 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-[1.5rem] transition shadow-sm border border-rose-100">Revoke</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+@endsection
