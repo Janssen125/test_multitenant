@@ -8,28 +8,38 @@ Route::get('/test', function () {
     return 'TEST OK';
 });
 
-// Central Routing (SaaS Platform Master Control)
-Route::middleware(['web'])->group(function () {
-    
-    // Platform Landing Page
-    Route::get('/', function () {
-        $tenants = \App\Models\Tenant::with('domains')->get();
-        return view('welcome', compact('tenants'));
-    })->name('central.landing');
+// Explicitly register central routes only on designated central domains
+$centralDomains = array_unique(array_merge(
+    config('tenancy.central_domains', []),
+    ['localhost', '127.0.0.1', 'test_multi_tenant.test', 'project-l7nc9.vercel.app']
+));
 
-    // Super Admin Side
-    Route::group(['prefix' => 'admin'], function() {
+foreach ($centralDomains as $domain) {
+    if (!$domain) continue;
+
+    Route::domain($domain)->middleware(['web'])->group(function () {
         
-        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('central.dashboard');
+        // Platform Landing Page
+        Route::get('/', function () {
+            $tenants = \App\Models\Tenant::with('domains')->get();
+            return view('welcome', compact('tenants'));
+        })->name('central.landing');
 
-        // Full Workspace / Tenant Management 
-        Route::group(['prefix' => 'tenants'], function() {
-            Route::get('/', [TenantController::class, 'index'])->name('tenants.index');
-            Route::get('/create', [TenantController::class, 'create'])->name('tenants.create');
-            Route::post('/', [TenantController::class, 'store'])->name('tenants.store');
-            Route::get('/{tenant}/edit', [TenantController::class, 'edit'])->name('tenants.edit');
-            Route::put('/{tenant}', [TenantController::class, 'update'])->name('tenants.update');
-            Route::delete('/{tenant}', [TenantController::class, 'destroy'])->name('tenants.destroy');
+        // Super Admin Hub routes
+        Route::prefix('admin')->group(function () {
+            
+            // Master Admin Dashboard 
+            Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('central.dashboard');
+
+            // Master Tenant & Workspace Management
+            Route::prefix('tenants')->group(function() {
+                Route::get('/', [TenantController::class, 'index'])->name('tenants.index');
+                Route::get('/create', [TenantController::class, 'create'])->name('tenants.create');
+                Route::post('/', [TenantController::class, 'store'])->name('tenants.store');
+                Route::get('/{tenant}/edit', [TenantController::class, 'edit'])->name('tenants.edit');
+                Route::put('/{tenant}', [TenantController::class, 'update'])->name('tenants.update');
+                Route::delete('/{tenant}', [TenantController::class, 'destroy'])->name('tenants.destroy');
+            });
         });
     });
-});
+}
