@@ -17,6 +17,7 @@ return [
      * The list of domains hosting your central app.
      *
      * Only relevant if you're using the domain or subdomain identification middleware.
+     */
     'central_domains' => array_filter([
         'test_multi_tenant.test',
         'localhost',
