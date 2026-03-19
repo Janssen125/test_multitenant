@@ -41,6 +41,33 @@ class TenantController extends Controller
     }
 
     /**
+     * Show the form for editing the specified tenant.
+     */
+    public function edit(Tenant $tenant)
+    {
+        $tenant->load('domains');
+        return view('central.tenants.edit', compact('tenant'));
+    }
+
+    /**
+     * Update the specified tenant in storage.
+     */
+    public function update(Request $request, Tenant $tenant)
+    {
+        $validated = $request->validate([
+            'domain' => 'required|string|unique:domains,domain,' . $tenant->domains->first()?->id,
+        ]);
+
+        if ($tenant->domains->first()) {
+            $tenant->domains->first()->update(['domain' => $validated['domain']]);
+        } else {
+            $tenant->domains()->create(['domain' => $validated['domain']]);
+        }
+
+        return redirect()->route('tenants.index')->with('success', 'Workspace updated successfully.');
+    }
+
+    /**
      * Remove the specified tenant from storage.
      */
     public function destroy(Tenant $tenant)

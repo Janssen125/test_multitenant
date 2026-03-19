@@ -68,11 +68,16 @@
                                 </td>
                                 <td class="p-6 text-sm text-gray-500 font-medium">{{ $tenant->created_at->format('M d, Y') }}</td>
                                 <td class="p-6 text-right">
-                                    <form action="{{ route('tenants.destroy', $tenant->id) }}" method="POST" onsubmit="return confirm('WARNING: Destroying this workspace is permanent. Proceed?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="bg-rose-50 text-rose-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-rose-600 hover:text-white transition shadow-sm border border-rose-100">Delete</button>
-                                    </form>
+                                    <div class="flex justify-end gap-3">
+                                        <a href="{{ route('tenants.edit', $tenant->id) }}" class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-600 hover:text-white transition shadow-sm border border-indigo-100 flex items-center gap-1.5 focus:ring-4 focus:ring-indigo-100">
+                                            Edit
+                                        </a>
+                                        <form action="{{ route('tenants.destroy', $tenant->id) }}" method="POST" onsubmit="return confirm('WARNING: Destroying this workspace is permanent. Proceed?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="bg-rose-50 text-rose-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-rose-600 hover:text-white transition shadow-sm border border-rose-100 flex items-center gap-1.5 focus:ring-4 focus:ring-rose-100">Delete</button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

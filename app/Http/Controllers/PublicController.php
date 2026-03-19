@@ -12,7 +12,7 @@ class PublicController extends Controller
      */
     public function showMenu()
     {
-        $menus = Menu::where('is_active', true)->get();
+        $menus = Menu::where('is_active', '=', true)->get();
         return view('tenant.public', compact('menus'));
     }
 }
