@@ -3,6 +3,10 @@
 // use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/test', function () {
+    return 'TEST OK';
+});
+
 Route::domain('test_multi_tenant.test')->group(function () {
 
     Route::get('/', function () {
