@@ -4,35 +4,31 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\TenantController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/test', function () {
-    return 'TEST OK';
-});
-
-// Explicitly register central routes only on designated central domains
-$centralDomains = array_unique(array_merge(
-    config('tenancy.central_domains', []),
-    ['localhost', '127.0.0.1', 'test_multi_tenant.test', 'project-l7nc9.vercel.app']
-));
+/**
+ * 🏢 Central Platform Hub
+ * These routes are explicitly locked to only work on designated central domains.
+ * This prevents central hub routes from appearing on tenant subdomains.
+ */
+$centralDomains = config('tenancy.central_domains', ['localhost', 'test_multi_tenant.test', '127.0.0.1']);
 
 foreach ($centralDomains as $domain) {
     if (!$domain) continue;
 
     Route::domain($domain)->middleware(['web'])->group(function () {
         
-        // Platform Landing Page
+        // 1. Central Platform Landing
         Route::get('/', function () {
             $tenants = \App\Models\Tenant::with('domains')->get();
             return view('welcome', compact('tenants'));
         })->name('central.landing');
 
-        // Super Admin Hub routes
-        Route::group(['prefix' => 'admin'], function() {
+        // 2. Platform Management Hub 🛡️
+        Route::middleware(['auth', 'role:super_admin'])->prefix('platform')->group(function () {
             
-            // Master Admin Dashboard 
             Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('central.dashboard');
 
-            // Workspace Management (Full CRUD)
-            Route::group(['prefix' => 'tenants'], function() {
+            // Workspace management
+            Route::prefix('workspaces')->group(function () {
                 Route::get('/', [TenantController::class, 'index'])->name('tenants.index');
                 Route::get('/create', [TenantController::class, 'create'])->name('tenants.create');
                 Route::post('/', [TenantController::class, 'store'])->name('tenants.store');
@@ -41,8 +37,8 @@ foreach ($centralDomains as $domain) {
                 Route::delete('/{tenant}', [TenantController::class, 'destroy'])->name('tenants.destroy');
             });
 
-            // Master User Management (Full CRUD)
-            Route::group(['prefix' => 'users'], function() {
+            // Platform operators
+            Route::prefix('operators')->group(function () {
                 Route::get('/', [AdminController::class, 'usersIndex'])->name('central.users.index');
                 Route::get('/create', [AdminController::class, 'createUser'])->name('central.users.create');
                 Route::post('/', [AdminController::class, 'storeUser'])->name('central.users.store');
@@ -51,5 +47,19 @@ foreach ($centralDomains as $domain) {
                 Route::delete('/{user}', [AdminController::class, 'destroyUser'])->name('central.users.destroy');
             });
         });
+
+        // Dedicated Auth routes for this domain
+        require __DIR__.'/auth.php';
     });
 }
+
+// Global Landing Fallback (if any domain is not matched and not initialized)
+Route::middleware(['web'])->group(function() {
+    Route::get('/debug-host', function () {
+        return [
+            'host' => request()->getHost(),
+            'tenant' => tenant('id'),
+            'central_domains' => config('tenancy.central_domains', [])
+        ];
+    });
+});

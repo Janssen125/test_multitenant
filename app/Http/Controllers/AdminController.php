@@ -52,6 +52,7 @@ class AdminController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'role' => 'super_admin',
         ]);
 
         return redirect()->route('central.users.index')->with('success', 'Central administrator added.');

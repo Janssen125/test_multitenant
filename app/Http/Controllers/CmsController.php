@@ -102,6 +102,7 @@ class CmsController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
+            'role' => 'admin',
         ]);
 
         return redirect()->route('tenant.team')->with('status', 'Team member invited successfully!');
